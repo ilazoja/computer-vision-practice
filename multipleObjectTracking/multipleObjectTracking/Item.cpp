@@ -6,6 +6,25 @@ Item::Item()
 {
 }
 
+Item::Item(string name)
+{
+	setType(name);
+	if (name == "heart") {
+		setHSVmin(Scalar(28, 128, 44));
+		setHSVmax(Scalar(51, 256, 256));
+		setColour(Scalar(0, 0, 255));
+	}
+	if (name == "hand") {
+		setHSVmin(Scalar(163, 33, 0));
+		setHSVmax(Scalar(256, 256, 256));
+		setColour(Scalar(0, 0, 255));
+	}
+	if (name == "scalpal") {
+		setHSVmin(Scalar(114, 9, 0));
+		setHSVmax(Scalar(256, 44, 256));
+		setColour(Scalar(0, 0, 255));
+	}
+}
 
 Item::~Item()
 {
@@ -33,7 +52,7 @@ Scalar Item::getHSVmin(){
 }
 
 Scalar Item::getHSVmax(){
-	return HSVMax;
+	return HSVmax;
 }
 
 void Item::setHSVmin(Scalar min){

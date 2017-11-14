@@ -50,6 +50,17 @@ const String windowName1 = "HSV Image";
 const String windowName2 = "Thresholded Image";
 const String windowName3 = "After Morphological Operations";
 const String trackbarWindowName = "Trackbars";
+
+
+bool calibrationMode;//used for showing debugging windows, trackbars etc.
+
+bool mouseIsDragging;//used for showing a rectangle on screen as user clicks and drags mouse
+bool mouseMove;
+bool rectangleSelected;
+cv::Point initialClickPoint, currentMousePoint; //keep track of initial point clicked and current position of mouse
+cv::Rect rectangleROI; //this is the ROI that the user has selected
+vector<int> H_ROI, S_ROI, V_ROI;// HSV values from the click/drag ROI region stored in separate vectors so that we can sort them easily
+
 void on_trackbar( int, void* )
 {//This function gets called whenever a
 	// trackbar position is changed
@@ -87,6 +98,115 @@ void createTrackbars(){
     createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
     createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
     createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
+
+}
+
+void clickAndDrag_Rectangle(int event, int x, int y, int flags, void* param) {
+	//only if calibration mode is true will we use the mouse to change HSV values
+	if (calibrationMode == true) {
+		//get handle to video feed passed in as "param" and cast as Mat pointer
+		Mat* videoFeed = (Mat*)param;
+
+		if (event == CV_EVENT_LBUTTONDOWN && mouseIsDragging == false)
+		{
+			//keep track of initial point clicked
+			initialClickPoint = cv::Point(x, y);
+			//user has begun dragging the mouse
+			mouseIsDragging = true;
+		}
+		/* user is dragging the mouse */
+		if (event == CV_EVENT_MOUSEMOVE && mouseIsDragging == true)
+		{
+			//keep track of current mouse point
+			currentMousePoint = cv::Point(x, y);
+			//user has moved the mouse while clicking and dragging
+			mouseMove = true;
+		}
+		/* user has released left button */
+		if (event == CV_EVENT_LBUTTONUP && mouseIsDragging == true)
+		{
+			//set rectangle ROI to the rectangle that the user has selected
+			rectangleROI = Rect(initialClickPoint, currentMousePoint);
+
+			//reset boolean variables
+			mouseIsDragging = false;
+			mouseMove = false;
+			rectangleSelected = true;
+		}
+
+		if (event == CV_EVENT_RBUTTONDOWN) {
+			//user has clicked right mouse button
+			//Reset HSV Values
+			H_MIN = 0;
+			S_MIN = 0;
+			V_MIN = 0;
+			H_MAX = 255;
+			S_MAX = 255;
+			V_MAX = 255;
+
+		}
+		if (event == CV_EVENT_MBUTTONDOWN) {
+
+			//user has clicked middle mouse button
+			//enter code here if needed.
+		}
+	}
+
+}
+
+void recordHSV_Values(cv::Mat frame, cv::Mat hsv_frame) {
+
+	//save HSV values for ROI that user selected to a vector
+	if (mouseMove == false && rectangleSelected == true) {
+
+		//clear previous vector values
+		if (H_ROI.size()>0) H_ROI.clear();
+		if (S_ROI.size()>0) S_ROI.clear();
+		if (V_ROI.size()>0)V_ROI.clear();
+		//if the rectangle has no width or height (user has only dragged a line) then we don't try to iterate over the width or height
+		if (rectangleROI.width<1 || rectangleROI.height<1) cout << "Please drag a rectangle, not a line" << endl;
+		else {
+			for (int i = rectangleROI.x; i<rectangleROI.x + rectangleROI.width; i++) {
+				//iterate through both x and y direction and save HSV values at each and every point
+				for (int j = rectangleROI.y; j<rectangleROI.y + rectangleROI.height; j++) {
+					//save HSV value at this point
+					H_ROI.push_back((int)hsv_frame.at<cv::Vec3b>(j, i)[0]);
+					S_ROI.push_back((int)hsv_frame.at<cv::Vec3b>(j, i)[1]);
+					V_ROI.push_back((int)hsv_frame.at<cv::Vec3b>(j, i)[2]);
+				}
+			}
+		}
+		//reset rectangleSelected so user can select another region if necessary
+		rectangleSelected = false;
+		//set min and max HSV values from min and max elements of each array
+
+		if (H_ROI.size()>0) {
+			//NOTE: min_element and max_element return iterators so we must dereference them with "*"
+			H_MIN = *std::min_element(H_ROI.begin(), H_ROI.end());
+			H_MAX = *std::max_element(H_ROI.begin(), H_ROI.end());
+			cout << "MIN 'H' VALUE: " << H_MIN << endl;
+			cout << "MAX 'H' VALUE: " << H_MAX << endl;
+		}
+		if (S_ROI.size()>0) {
+			S_MIN = *std::min_element(S_ROI.begin(), S_ROI.end());
+			S_MAX = *std::max_element(S_ROI.begin(), S_ROI.end());
+			cout << "MIN 'S' VALUE: " << S_MIN << endl;
+			cout << "MAX 'S' VALUE: " << S_MAX << endl;
+		}
+		if (V_ROI.size()>0) {
+			V_MIN = *std::min_element(V_ROI.begin(), V_ROI.end());
+			V_MAX = *std::max_element(V_ROI.begin(), V_ROI.end());
+			cout << "MIN 'V' VALUE: " << V_MIN << endl;
+			cout << "MAX 'V' VALUE: " << V_MAX << endl;
+		}
+
+	}
+
+	if (mouseMove == true) {
+		//if the mouse is held down, we will draw the click and dragged rectangle to the screen
+		rectangle(frame, initialClickPoint, cv::Point(currentMousePoint.x, currentMousePoint.y), cv::Scalar(0, 255, 0), 1, 8, 0);
+	}
+
 
 }
 
@@ -178,7 +298,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
 	}
 }
-int main1(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	//some boolean variables for different functionality within this
 	//program
@@ -201,8 +321,21 @@ int main1(int argc, char* argv[])
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+
+	//must create a window before setting mouse callback
+	cv::namedWindow(windowName);
+	//set mouse callback function to be active on "Webcam Feed" window
+	//we pass the handle to our "frame" matrix so that we can draw a rectangle to it
+	//as the user clicks and drags the mouse
+	cv::setMouseCallback(windowName, clickAndDrag_Rectangle, &cameraFeed);
+	//initiate mouse move and drag to false 
+	mouseIsDragging = false;
+	mouseMove = false;
+	rectangleSelected = false;
+
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
+
 	int number_of_frames = 0;
 	while (1) {
 		if (!(GetKeyState(VK_SPACE) & 1))
@@ -234,6 +367,8 @@ int main1(int argc, char* argv[])
 		else trackObjects = false;
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+		//set HSV values from user selected region
+		recordHSV_Values(cameraFeed, HSV);
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
@@ -255,7 +390,7 @@ int main1(int argc, char* argv[])
 
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
-		waitKey(30);
+		if (waitKey(30) == 99) calibrationMode = !calibrationMode;//if user presses 'c', toggle calibration mode
 
 	}
 

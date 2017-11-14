@@ -24,9 +24,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="multipleObjectTracking.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -37,23 +34,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_calib3d330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_core330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_dnn330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_features2d330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_ffmpeg330_64.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_flann330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_highgui330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_imgcodecs330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_imgproc330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_ml330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_objdetect330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_photo330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_shape330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_stitching330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_superres330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_video330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_videoio330.dll" />
-    <None Include="..\..\..\..\..\OpenCV\OpenCV 3.3\bin\Release\opencv_videostab330.dll" />
+    <None Include="..\x64\Release\opencv_calib3d330.dll" />
+    <None Include="..\x64\Release\opencv_core330.dll" />
+    <None Include="..\x64\Release\opencv_dnn330.dll" />
+    <None Include="..\x64\Release\opencv_features2d330.dll" />
+    <None Include="..\x64\Release\opencv_ffmpeg330_64.dll" />
+    <None Include="..\x64\Release\opencv_flann330.dll" />
+    <None Include="..\x64\Release\opencv_highgui330.dll" />
+    <None Include="..\x64\Release\opencv_imgcodecs330.dll" />
+    <None Include="..\x64\Release\opencv_imgproc330.dll" />
+    <None Include="..\x64\Release\opencv_ml330.dll" />
+    <None Include="..\x64\Release\opencv_objdetect330.dll" />
+    <None Include="..\x64\Release\opencv_photo330.dll" />
+    <None Include="..\x64\Release\opencv_shape330.dll" />
+    <None Include="..\x64\Release\opencv_stitching330.dll" />
+    <None Include="..\x64\Release\opencv_superres330.dll" />
+    <None Include="..\x64\Release\opencv_video330.dll" />
+    <None Include="..\x64\Release\opencv_videoio330.dll" />
+    <None Include="..\x64\Release\opencv_videostab330.dll" />
   </ItemGroup>
 </Project>
