@@ -1,0 +1,60 @@
+function [H, theta, rho] = hough_lines_acc(BW, varargin)
+    % Compute Hough accumulator array for finding lines.
+    %
+    % BW: Binary (black and white) image containing edge pixels
+    % RhoResolution (optional): Difference between successive rho values, in pixels
+    % Theta (optional): Vector of theta values to use, in degrees
+    %
+    % Please see the Matlab documentation for hough():
+    % http://www.mathworks.com/help/images/ref/hough.html
+    % Your code should imitate the Matlab implementation.
+    %
+    % Pay close attention to the coordinate system specified in the assignment.
+    % Note: Rows of H should correspond to values of rho, columns those of theta.
+
+    %% Parse input arguments
+    p = inputParser();
+    addParameter(p, 'RhoResolution', 1);
+    addParameter(p, 'Theta', linspace(-90, 89, 180));
+    parse(p, varargin{:});
+
+    rhoStep = p.Results.RhoResolution;
+    thetaRange = p.Results.Theta;
+
+    %% TODO: Your code here
+    
+    [y, x] = find(BW~=0);
+    darray = [];
+    for edgeIndex = 1:size(y)
+        for angle = thetaRange(1):thetaRange(size(thetaRange,2))
+            d = x(edgeIndex)*cosd(angle) - y(edgeIndex)*sind(angle);
+            darray(edgeIndex, angle - thetaRange(1) + 1) = d;
+            %d = uint8(d);
+            %H(d, angle) = H(d, angle) + 1;
+        end
+    end 
+    minimum = min(darray(:));
+    darray = (darray - minimum + 1);
+    darray = uint16(darray);
+    maximum = max(darray(:));
+    bins = 1:rhostep:maximum+10;
+    darray = discretize(darray,bins);
+    H = zeros(max(darray(:)), size(darray,2));
+    index = 1;
+    for edgeindex = 1:size(darray,1)
+        for angle = 1:size(darray,2)
+            
+            d = darray(edgeindex,angle);
+            try
+                 H(d, angle) = H(d, angle) + 1;    
+            catch EM
+                why = 0;
+            end
+            rho(index) = d;
+            theta(index) = angle + thetaRange(1) - 1;
+            index = index + 1;
+        end
+    end
+    imshow(H, [0,max(H(:))]);
+
+end
