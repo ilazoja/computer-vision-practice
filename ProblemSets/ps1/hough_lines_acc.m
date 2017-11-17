@@ -24,24 +24,25 @@ function [H, theta, rho] = hough_lines_acc(BW, varargin)
     %% TODO: Your code here
     
     [y, x] = find(BW~=0);
-    darray = [];
+    theta = thetaRange(1) - 1;
+    darray = zeros(size(y,1), thetaRange(size(thetaRange,2))-thetaRange(1));
     for edgeIndex = 1:size(y)
         for angle = thetaRange(1):thetaRange(size(thetaRange,2))
             d = x(edgeIndex)*cosd(angle) - y(edgeIndex)*sind(angle);
-            darray(edgeIndex, angle - thetaRange(1) + 1) = d;
+            darray(edgeIndex, angle - theta) = d;
             %d = uint8(d);
             %H(d, angle) = H(d, angle) + 1;
         end
     end 
     
     % avoid negatives and round to have it as integer
-    minimum = min(darray(:));
-    darray = (darray - minimum + 1);
+    rho = min(darray(:)) - 1;
+    darray = (darray - rho);
     darray = uint16(darray);
     
     % put into bins
     maximum = max(darray(:));
-    bins = 1:rhoStep:maximum+rhoStep;0
+    bins = 1:rhoStep:maximum+rhoStep;
     darray = discretize(darray,bins);
     H = zeros(max(darray(:)), size(darray,2));
     index = 1;
@@ -51,11 +52,8 @@ function [H, theta, rho] = hough_lines_acc(BW, varargin)
             d = darray(edgeindex,angle);
 
             H(d, angle) = H(d, angle) + 1;    
-            rho(index) = d;
-            theta(index) = angle;% + thetaRange(1) - 1;
             index = index + 1;
         end
     end
-    imshow(H, [0,max(H(:))]);
-
+ %   imshow(H, [0,max(H(:))]);
 end

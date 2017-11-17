@@ -55,12 +55,15 @@ function [centers, radii] = find_circles(BW, radius_range)
         end
     end
     
-    [centers, radii] = hough_peaks_3d(H, 30, 'Threshold', 0.5 * max(H(:)), 'NHoodSize', floor(size(H) / 100.0) * 6 + 1);
-    centers(:) = centers(:) + rho;
-
-    
-    
-    
+    centers = hough_peaks_3d(H, 30, 'Threshold', 0.6 * max(H(:)), 'NHoodSize', floor(size(H) / 100.0) * 6 + 1);
+    centers(:,1) = centers(:,1) + rho;
+    centers(:,2) = centers(:,2) + rho;
+    radii = ones(size(centers,1),1)*radius;
+    f = figure();
+    imshow(BW);
+    hold on;
+    viscircles([centers(:,2), centers(:,1)],centers(:,3));
+    close(f);
 %saveas(f, fullfile('output', 'ps1-5-a-3.png')); 
     %   imshow(H, [0,max(H(:))]);
 end

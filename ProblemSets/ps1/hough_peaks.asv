@@ -22,14 +22,42 @@ function peaks = hough_peaks(H, varargin)
     % TODO: Your code here
     peaks = [];
     numPeaksFound = 1;
+    filterArray = zeros(nHoodSize(1), nHoodSize(2));
+   
+    
     for i = 1:size(H,1)
         for j = 1:size(H,2)
             if H(i,j) > threshold & numPeaksFound < numpeaks
                 peaks(numPeaksFound, 1) = i;
                 peaks(numPeaksFound, 2) = j;
                 numPeaksFound = numPeaksFound + 1;
+                
+                filterArray((nHoodSize(1)+1)/2,(nHoodSize(2)+1)/2) = H(i,j);
+                up = i-(nHoodSize(1)-1)/2;
+                diffup = 0;
+                if up < 0
+                    diffup = 0 - up;
+                    up = 0;
+                end
+                down = i+(nHoodSize(1)-1)/2;
+                diffdown = 0;
+                if down > size(H,1)
+                    diffdown = down - size(H,1);
+                    down = size(H,1);
+                end
+                left = j-(nHoodSize(2)-1)/2;
+                diffleft = 0 - left;
+                if left < 0
+                    left = 0;
+                end
+                right = j+(nHoodSize(2)-1)/2;
+                if right > size(H,2)
+                    right = size(H,2);
+                end
+                
+                H(up:down,left:right) = filterArray(down-up:right-left);
                 for supi = 1:(nHoodSize(1)-1)/2
-                    for supj = 0:(nHoodSize(2)-1)/2
+                    for supj = 1:(nHoodSize(2)-1)/2
                         H(i+supi, j+supj) = 0;
                     end
                 end

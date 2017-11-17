@@ -1,0 +1,26 @@
+function hough_lines_draw(img, outfile, peaks, rho, theta)
+    % Draw lines found in an image using Hough transform.
+    %
+    % img: Image on top of which to draw lines
+    % outfile: Output image filename to save plot as
+    % peaks: Qx2 matrix containing row, column indices of the Q peaks found in accumulator
+    % rho: Vector of rho values, in pixels
+    % theta: Vector of theta values, in degrees
+
+    % TODO: Your code here
+    clf;
+    imshow(img)
+    x = 0:size(img,1);
+    y = (6/8)*x;
+    imagesc([0 size(img,1)], [0 size(img,2)], flipud(img));
+    hold on;
+    for peakNumber = 1:size(peaks,1)
+        plot(x,y,'b-*','linewidth',1.5);
+        hold on;
+    end
+    
+    % set the y-axis back to normal.
+    set(gca,'ydir','normal');
+    
+    
+end
