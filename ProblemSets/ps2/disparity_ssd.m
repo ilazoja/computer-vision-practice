@@ -7,25 +7,26 @@ function D = disparity_ssd(L, R)
 
     %% Define image patch location (topleft [row col]) and size
     
+    b = 5;
+    num_row_blocks = floor(size(L, 1) / b);
+    num_col_blocks = floor(size(L, 2) / b);
     patch_size = [10 10];
     D = zeros(size(L));
     
-    for i = 1:(size(L, 1) - patch_size(1) + 1)
-        for j = 1:(size(L, 2) - patch_size(2) + 1)
-            patch_loc = [i j];
+    for i = 0:(num_row_blocks - 1)
+        for j = 0:(num_col_blocks - 1)
+            x_left = j*b + 1;
+            x_up = i*b + 1;
+            patch_left = L(x_up:(x_up + b - 1), x_left:(x_left + b - 1));
+            strip_right = R(x_up:(x_up + b - 1), :);
+            %figure, imshow(patch_left);
+            %figure, imshow(strip_right);
+            %close all;
             
-            % Extract patch (from left image)
-            patch_left = L(i:(i + patch_size(1) - 1), j:(j + patch_size(2) - 1));
-            %figure, imshow(L);
-
-            % Extract strip (from right image)
-            strip_right = R(i:(i + patch_size(1) - 1), :);
-            %figure, imshow(R);
-
-            % Now look for the patch in the strip and report the best position (column index of topleft corner)
-            [best_x, D(i,j)] = find_best_match(patch_left, strip_right);
-            disp(best_x);
-            patch_right = R(i:(i + patch_size(1) - 1), best_x:(best_x + patch_size(2) - 1));
+            [x_right] = find_best_match(patch_left, strip_right);
+            D(x_left,x_up) = x_left - x_right;
+            disp(D(x_left,x_up));
+            %patch_right = R(i:(i + patch_size(1) - 1), D(x_left,x_up):(D(x_left,x_up) + patch_size(2) - 1));
             %imshow(patch_right);    
             %close all;
         end
@@ -34,7 +35,7 @@ end
 
     % TODO: Your code here
     % Find best match
-function [best_x, lowest_ssd] = find_best_match(patch, strip)
+function [best_x] = find_best_match(patch, strip)
     % TODO: Find patch in strip and return column index (x value) of topleft corner
     best_x = 1; % placeholder
     lowest_ssd = Inf;
