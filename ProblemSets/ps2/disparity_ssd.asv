@@ -1,0 +1,46 @@
+function D = disparity_ssd(L, R)
+    % Compute disparity map D(y, x) such that: L(y, x) = R(y, x + D(y, x))
+    %
+    % L: Grayscale left image
+    % R: Grayscale right image, same size as L
+    % D: Output disparity map, same size as L, R
+
+    %% Define image patch location (topleft [row col]) and size
+    patch_loc = [1 1];
+    patch_size = [100 100];
+    
+    for i = 1:(size(L, 1) - size(patch_size, 1) + 1)
+        for j = 1:(size(L, 2) - size(patch_size, 2) + 1)
+            % Extract patch (from left image)
+            patch_left = left_gray(patch_loc(1):(patch_loc(1) + patch_size(1) - 1), patch_loc(2):(patch_loc(2) + patch_size(2) - 1));
+            figure, imshow(patch_left);
+
+            % Extract strip (from right image)
+            strip_right = right_gray(patch_loc(1):(patch_loc(1) + patch_size(1) - 1), :);
+            figure, imshow(strip_right);
+
+            % Now look for the patch in the strip and report the best position (column index of topleft corner)
+            best_x = find_best_match(patch_left, strip_right);
+            disp(best_x);
+            patch_right = right_gray(patch_loc(1):(patch_loc(1) + patch_size(1) - 1), best_x:(best_x + patch_size(2) - 1));
+            figure, imshow(patch_right);      
+        end
+    end
+end
+
+    % TODO: Your code here
+    % Find best match
+function best_x = find_best_match(patch, strip)
+    % TODO: Find patch in strip and return column index (x value) of topleft corner
+    best_x = 1; % placeholder
+    lowest_ssd = 1000;
+    for x = 1:(size(strip, 2) - size(patch, 2) + 1)
+        patch_compare = strip(:, x:(x+size(patch) - 1));
+        diff = patch_compare - patch;
+        ssd = sum(diff(:).^2);
+        if ssd < lowest_ssd
+            lowest_ssd = ssd;
+            best_x = x;
+        end
+    end
+end
