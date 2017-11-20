@@ -1,4 +1,4 @@
-function D = disparity_ssd(L, R)
+function D = disparity_ssd(L, R, b)
     % Compute disparity map D(y, x) such that: L(y, x) = R(y, x + D(y, x))
     %
     % L: Grayscale left image
@@ -7,16 +7,14 @@ function D = disparity_ssd(L, R)
 
     %% Define image patch location (topleft [row col]) and size
     
-    b = 5;
     num_row_blocks = floor(size(L, 1) / b);
     num_col_blocks = floor(size(L, 2) / b);
-    patch_size = [10 10];
     D = zeros(size(L));
     
-    for i = 0:(num_row_blocks - 1)
-        for j = 0:(num_col_blocks - 1)
-            x_left = j*b + 1;
-            x_up = i*b + 1;
+    for i = 1:(size(L, 1) - b)
+        for j = 1:(size(L, 2) - b)
+            x_left = j; %*b + 1;
+            x_up = i; %*b + 1;
             patch_left = L(x_up:(x_up + b - 1), x_left:(x_left + b - 1));
             strip_right = R(x_up:(x_up + b - 1), :);
             %figure, imshow(patch_left);
@@ -25,7 +23,7 @@ function D = disparity_ssd(L, R)
             
             [x_right] = find_best_match(patch_left, strip_right);
             D(x_left,x_up) = x_left - x_right;
-            disp(D(x_left,x_up));
+            %disp(D(x_left,x_up));
             %patch_right = R(i:(i + patch_size(1) - 1), D(x_left,x_up):(D(x_left,x_up) + patch_size(2) - 1));
             %imshow(patch_right);    
             %close all;
