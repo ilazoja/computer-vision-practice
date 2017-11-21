@@ -6,8 +6,8 @@ L = im2double(imread(fullfile('input', 'pair0-L.png')));
 R = im2double(imread(fullfile('input', 'pair0-R.png')));
 
 % Compute disparity
-D_L = disparity_ssd(L, R, 10);
-D_R = disparity_ssd(R, L, 10);
+D_L = disparity_ssd(L, R, 10, true);
+D_R = disparity_ssd(R, L, 10, true);
 
 % TODO: Save output images (D_L as output/ps2-1-a-1.png and D_R as output/ps2-1-a-2.png)
 % Note: They may need to be scaled/shifted before saving to show results properly
@@ -27,18 +27,61 @@ close(f);
 L = im2double(imread(fullfile('input', 'pair1-L.png')));
 R = im2double(imread(fullfile('input', 'pair1-R.png')));
 
+L = rgb2gray(L);
+R = rgb2gray(R);
+
 % Compute disparity
-D_L = disparity_ssd(L, R, 100);
-D_R = disparity_ssd(R, L, 100);
+D_L = disparity_ssd(L, R, 100, true);
+D_R = disparity_ssd(R, L, 100, true);
 
 % Save output images (D_L as output/ps2-1-a-1.png and D_R as output/ps2-1-a-2.png)
 % Note: They may need to be scaled/shifted before saving to show results properly
 f = figure();
-imshow(D_L, [0 2]);
+imshow(D_L, [0 max(D_L(:))]);
 saveas(f, fullfile('output', 'ps2-2-a-1.png'));
 close(f);
 
 f = figure();
-imshow(D_R, [-2 0]);
+imshow(D_R, [min(D_R(:)) 0]);
 saveas(f, fullfile('output', 'ps2-2-a-2.png'));
+close(f);
+
+%% 3-a
+noise_sigma = 25;
+noise = randn(size(img)) .* noise_sigma;
+noisy_L = L + noise;
+
+% Compute disparity
+D_L = disparity_ssd(noisy_L, R, 100, true);
+D_R = disparity_ssd(R, noisy_L, 100, true);
+
+% Save output images (D_L as output/ps2-1-a-1.png and D_R as output/ps2-1-a-2.png)
+% Note: They may need to be scaled/shifted before saving to show results properly
+f = figure();
+imshow(D_L, [0 max(D_L(:))]);
+saveas(f, fullfile('output', 'ps2-3-a-1.png'));
+close(f);
+
+f = figure();
+imshow(D_R, [min(D_R(:)) 0]);
+saveas(f, fullfile('output', 'ps2-3-a-2.png'));
+close(f);
+
+%% 3-b
+brighter_L = L .* 1.10;
+
+% Compute disparity
+D_L = disparity_ssd(brighter_L, R, 100, true);
+D_R = disparity_ssd(R, brighter_L, 100, true);
+
+% Save output images (D_L as output/ps2-1-a-1.png and D_R as output/ps2-1-a-2.png)
+% Note: They may need to be scaled/shifted before saving to show results properly
+f = figure();
+imshow(D_L, [0 max(D_L(:))]);
+saveas(f, fullfile('output', 'ps2-3-a-1.png'));
+close(f);
+
+f = figure();
+imshow(D_R, [min(D_R(:)) 0]);
+saveas(f, fullfile('output', 'ps2-3-a-2.png'));
 close(f);

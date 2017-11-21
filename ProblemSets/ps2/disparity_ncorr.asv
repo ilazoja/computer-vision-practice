@@ -1,11 +1,11 @@
-function D = disparity_ssd(L, R, b, overlap, rangeToCheck)
+function D = disparity_ncorr(L, R, overlap, rangeToCheck)
     % Compute disparity map D(y, x) such that: L(y, x) = R(y, x + D(y, x))
     %
     % L: Grayscale left image
     % R: Grayscale right image, same size as L
     % D: Output disparity map, same size as L, R
 
-    %% Define image patch location (topleft [row col]) and size
+    % TODO: Your code here
     
     num_row_blocks = floor(size(L, 1) / b);
     num_col_blocks = floor(size(L, 2) / b);
@@ -51,28 +51,10 @@ end
     % Find best match
 function [best_x] = find_best_match(patch, strip, j, rangeToCheck)
     % TODO: Find patch in strip and return column index (x value) of topleft corner
-    best_x = 1; % placeholder
-    lowest_ssd = Inf;
-    if rangeToCheck > 0
-        minRange = j;
-        maxRange = j + rangeToCheck;
-    else
-        minRange = j + rangeToCheck;
-        maxRange = j;
-    end
-    if minRange < 1
-        minRange = 1;
-    end
-    if maxRange > size(strip, 2) - size(patch, 2) + 1
-        maxRange = size(strip, 2) - size(patch, 2) + 1;;
-    end
-    for x = minRange:maxRange
-        patch_compare = strip(:, x:(x+size(patch) - 1));
-        diff = patch_compare - patch;
-        ssd = sum(diff(:).^2);
-        if ssd < lowest_ssd
-            lowest_ssd = ssd;
-            best_x = x;
-        end
-    end
+    patch_compare = strip(:, x:(x+size(patch) - 1));
+    c = normxcorr2(patch,patch_compare);
+    [ypeak, xpeak] = find(c==max(c(:)));
+    yoffSet = ypeak-size(patch,1);
+    best_x = xpeak-size(patch,2);
+
 end
