@@ -1,0 +1,3 @@
+%% 1-a
+points2D = dlmread('pts2d-norm-pic_a.txt');
+points3D = dlmread('pts3d-norm.txt');
