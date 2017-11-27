@@ -1,0 +1,23 @@
+function matchSIFT(imgA, imgB, frameA, frameB, filter)
+%MATCHSIFT Summary of this function goes here
+%   Detailed explanation goes here
+    %imgAgrey = rgb2gray(imgA);
+    %imgBgrey = rgb2gray(imgB);
+    imgAsmooth = imfilter(single(imgA), filter);
+    imgBsmooth = imfilter(single(imgB), filter);
+    
+    [fa, da] = vl_sift(imgAsmooth, 'frames', frameA);
+    [fb, db] = vl_sift(imgBsmooth, 'frames', frameB);
+    
+    [M, scores] = vl_ubcmatch(da, db);
+    
+    xa = fa(1,matches(1,:)) ;
+    xb = fb(1,matches(2,:)) + size(Ia,2) ;
+    ya = fa(2,matches(1,:)) ;
+    yb = fb(2,matches(2,:)) ;
+    
+    imshow([imgA, imgB]);
+    for i = 1:size(ka,2);
+        line([ka(1,i) kb(1,i) + size(imgA, 2)], [ka(2,i) kb(2,i)]);
+    end
+end

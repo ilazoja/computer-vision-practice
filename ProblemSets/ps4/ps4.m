@@ -1,5 +1,9 @@
 close all;
-run('C:/Ilir/ComputerVision/Vlfeat/vlfeat-0.9.20/toolbox/vl_setup')
+%run('C:/Ilir/ComputerVision/Vlfeat/vlfeat-0.9.20/toolbox/vl_setup')
+run('C:\Users\Ilir\Documents\Ilir\ComputerVision\VLFeat\vlfeat-0.9.20\toolbox\vl_setup')
+
+filter_size = 21;
+filter_sigma = 3;
 
 simA = imread(fullfile('input', 'simA.jpg'));
 simB = imread(fullfile('input', 'simB.jpg'));
@@ -8,33 +12,34 @@ transB = imread(fullfile('input', 'transB.jpg'));
 
 %% 1-a
 [Ix1A, Iy1A, I1A] = computeGradients(simA);
-% [Ix1B, Iy1B, I1B] = computeGradients(simB);
+[Ix1B, Iy1B, I1B] = computeGradients(simB);
 % imshow(I1A);
 % [Ix2A, Iy2A, I1A] = computeGradients(transA);
 % [Ix2B, Iy2B, I2B] = computeGradients(transB);
 
 %% 1-b
-Rm1A = computeHarrisValues(Ix1A, Iy1A, 0.04, 21, 3);
-% Rm1B = computeHarrisValues(Ix1B, Iy1B, 0.04, 21, 3);
-% Rm2A = computeHarrisValues(Ix2A, Iy2A, 0.04, 21, 3);
-% Rm2B = computeHarrisValues(Ix2B, Iy2B, 0.04, 21, 3);
+Rm1A = computeHarrisValues(Ix1A, Iy1A, 0.04, filter_size, filter_sigma);
+Rm1B = computeHarrisValues(Ix1B, Iy1B, 0.04, filter_size, filter_sigma);
+% Rm2A = computeHarrisValues(Ix2A, Iy2A, 0.04, filter_size, filter_sigma);
+% Rm2B = computeHarrisValues(Ix2B, Iy2B, 0.04, filter_size, filter_sigma);
 
 %% 1-c
 Rm1A = adjustHarris(Rm1A, 0.5, 5);
-% Rm1B = adjustHarris(Rm1B, 0.5, 5);
+Rm1B = adjustHarris(Rm1B, 0.5, 5);
 % Rm2A = adjustHarris(Rm2A, 0.5, 5);
 % Rm2B = adjustHarris(Rm2B, 0.5, 5);
 
 %% 2-a
-[row, col] = find(Rm1A ~= 0);
-angles = atan2(Ix1A, Iy1A);
-
-selectedAngles = zeros(size(row));
-for i = 1:size(row)
-    selectedAngles(i) = angles(row(i), col(i));
-end
-frame = [col  row  ones(size(row))*10  selectedAngles]';
-imshow(simA);
+[selectedAngles1A, points1A] = computeAngles(Rm1A, Ix1A, Iy1A);
+frame = [points1A  ones(size(points1A,1),1)*10  selectedAngles1A]';
+imshow([simA simB]);
 h1 = vl_plotframe(frame);
-set(h1,'color','k','linewidth',3) ;
-set(h2,'color','y','linewidth',2) ;
+[selectedAngles1B, points1B] = computeAngles(Rm1B, Ix1B, Iy1B);
+frame = [points1B(:,1)+size(simA,2) points1B(:,2)  ones(size(points1B,1),1)*10  selectedAngles1B]';
+h2 = vl_plotframe(frame);
+%% 2-b
+Gxy = fspecial('gaussian', filter_size, filter_sigma);
+frame1A = [points1A  ones(size(points1A,1),1)  selectedAngles1A]';
+frame1B = [points1B  ones(size(points1B,1),1)  selectedAngles1B]';
+matchSIFT(simA, simB, frame1A, frame1B, Gxy);
+

@@ -1,7 +1,5 @@
 function Rm = computeHarrisValues(Ix, Iy, a, filter_size, filter_sigma)
-    numOfRows = size(Ix,1);
-    numOfColumns = size(Ix,2);
-
+    
     % gaussian window
     Gxy = fspecial('gaussian', filter_size, filter_sigma);
 
@@ -19,10 +17,12 @@ function Rm = computeHarrisValues(Ix, Iy, a, filter_size, filter_sigma)
     % sums of the products of derivatives at each pixel
 
     %window convolved with derivatives
-    Sx2 = conv2(Gxy, Ix2);
-    Sy2 = conv2(Gxy, Iy2);
-    Sxy = conv2(Gxy, Ixy);
+    Sx2 = conv2(Ix2, Gxy, 'same');
+    Sy2 = conv2(Iy2, Gxy, 'same');
+    Sxy = conv2(Ixy, Gxy, 'same');
 
+    numOfRows = size(Sxy,1);
+    numOfColumns = size(Sxy,2);
     Rm = zeros(numOfRows, numOfColumns);
     for x=1:numOfRows,
         for y=1:numOfColumns,
