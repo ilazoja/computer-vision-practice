@@ -9,8 +9,9 @@ function reducedImg = reduce(img)
     cw = .375; % kernel centre weight, same as MATLAB func impyramid. 0.6 in the Paper
     ker1d = [.25-cw/2 .25 cw .25 .25-cw/2];
     kernel = kron(ker1d,ker1d');
-    reducedImg = conv2(img, kernel, 'same');
+    reducedImg = imfilter(img, kernel, 'replicate', 'same');
     reducedImg = reducedImg(1:2:end, 1:2:end);
+    if (
     imshow(reducedImg, [0 255]);   
 end
 

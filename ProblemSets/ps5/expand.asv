@@ -10,13 +10,20 @@ function expandedImg = expand(img)
     
     sz = size(img(:,:));
     
-    osz = sz*2;
+    if mod(sz, 2) == 0
+        osz = sz*2;
+        imgph = img;
+        imgpv = img;
 
     expandedImg = zeros(osz(1),osz(2));
     
+	img00 = imfilter(img,ker00,'replicate','same');
 	expandedImg(1:2:osz(1),1:2:osz(2)) = img;
-	expandedImg = conv2(expandedImg,kernel,'same');
-
+	expandedImg(2:2:osz(1),1:2:osz(2)) = img10;
+	expandedImg(1:2:osz(1),2:2:osz(2)) = img01;
+	expandedImg(2:2:osz(1),2:2:osz(2)) = img11;
+    
+    imshow(
     imshow(expandedImg, [0 max(expandedImg(:))]);
 end
 
