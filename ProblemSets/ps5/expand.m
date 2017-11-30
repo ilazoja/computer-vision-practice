@@ -17,6 +17,5 @@ function expandedImg = expand(img)
 	expandedImg(1:2:osz(1),1:2:osz(2)) = img;
 	expandedImg = conv2(expandedImg,kernel,'same');
 
-    imshow(expandedImg, [0 max(expandedImg(:))]);
 end
 

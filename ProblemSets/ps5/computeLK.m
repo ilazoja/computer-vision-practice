@@ -30,6 +30,7 @@ function [u, v] = computeGradients(Ix, Iy, It, wSize)
 
     numOfRows = size(Sxy,1);
     numOfColumns = size(Sxy,2);
+    
     u = zeros(numOfRows, numOfColumns);
     v = zeros(numOfRows, numOfColumns);
     for x=1:numOfRows,

@@ -11,6 +11,5 @@ function reducedImg = reduce(img)
     kernel = kron(ker1d,ker1d');
     reducedImg = conv2(img, kernel, 'same');
     reducedImg = reducedImg(1:2:end, 1:2:end);
-    imshow(reducedImg, [0 255]);   
 end
 
