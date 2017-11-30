@@ -14,8 +14,8 @@ function [U,V] = hierarchicalLK(L, R, k)
             V = 2*expand(V);
         end     
         Wk = warp(Lk,U,V);
-        [Ix, Iy, It] = computeGradients(Wk, Rk);
-        [Dx, Dy] = computeLK(Ix, Iy, It, 5);
+        %[Ix, Iy, It] = computeGradients(Rk, Wk);
+        [Dx, Dy] = computeLK(Wk, Rk, 45);
          U = U + Dx;
          [row, col] = find(isnan(U));
          if size(row,1) ~= 0

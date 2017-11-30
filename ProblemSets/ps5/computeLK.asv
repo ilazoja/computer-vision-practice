@@ -1,32 +1,33 @@
-function [u, v] = computeGradients(im1, im2, wSize)
-    w = round(wSize/2);
+function [u, v] = computeGradients(Ix, Iy, It, wSize, wSigma)
+    ww = 45;
+    w = round(ww/2);
 
-    % Lucas Kanade Here
-    % for each point, calculate I_x, I_y, I_t
-    Ix_m = conv2(im1,[-1 1; -1 1], 'valid'); % partial on x
-    Iy_m = conv2(im1, [-1 -1; 1 1], 'valid'); % partial on y
-    It_m = conv2(im1, ones(2), 'valid') + conv2(im2, -ones(2), 'valid'); % partial on t
-    u = zeros(size(im1));
-    v = zeros(size(im2));
+% Lucas Kanade Here
+% for each point, calculate I_x, I_y, I_t
+Ix_m = conv2(im1,[-1 1; -1 1], 'valid'); % partial on x
+Iy_m = conv2(im1, [-1 -1; 1 1], 'valid'); % partial on y
+It_m = conv2(im1, ones(2), 'valid') + conv2(im2, -ones(2), 'valid'); % partial on t
+u = zeros(size(im1));
+v = zeros(size(im2));
 
-    % within window ww * ww
-    for i = w+1:size(Ix_m,1)-w
-        for j = w+1:size(Ix_m,2)-w
-            Ix = Ix_m(i-w:i+w, j-w:j+w);
-            Iy = Iy_m(i-w:i+w, j-w:j+w);
-            It = It_m(i-w:i+w, j-w:j+w);
+% within window ww * ww
+for i = w+1:size(Ix_m,1)-w
+   for j = w+1:size(Ix_m,2)-w
+      Ix = Ix_m(i-w:i+w, j-w:j+w);
+      Iy = Iy_m(i-w:i+w, j-w:j+w);
+      It = It_m(i-w:i+w, j-w:j+w);
 
-            Ix = Ix(:);
-            Iy = Iy(:);
-            b = -It(:); % get b here
+      Ix = Ix(:);
+      Iy = Iy(:);
+      b = -It(:); % get b here
 
-            A = [Ix Iy]; % get A here
-            nu = pinv(A)*b; % get velocity here
+      A = [Ix Iy]; % get A here
+      nu = pinv(A)*b; % get velocity here
 
-            u(i,j)=nu(1);
-            v(i,j)=nu(2);
-        end;
-     end
+      u(i,j)=nu(1);
+      v(i,j)=nu(2);
+   end;
+end
 %     % size must be odd, has to have middle pixel
 % %     middle = (wSize + 1)/2;
 % %     u = zeros(size(gt, 1) - middle*2);

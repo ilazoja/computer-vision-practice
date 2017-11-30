@@ -10,4 +10,7 @@ function [warpI2]=warp(i2,vx,vy)
         warpI2=interp2(x,y,i2,x+vx,y+vy,'*linear');
         I=find(isnan(warpI2)); 
         warpI2(I)=warpI3(I);
+        % fix NaNs
+        ind=find(~(warpI2>0 & warpI2<256));
+        warpI2(ind)=0.0; 
 end
